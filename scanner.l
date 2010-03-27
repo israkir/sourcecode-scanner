@@ -16,39 +16,44 @@
 
 	/*----- DEFINITIONS PART -----*/
 DIGIT		[0-9]
-INTEGER		[0-9]{1,} /* One or more "one of the digits" */
+LETTER		[A-Za-z]
+ID			{LETTER}({LETTER}|{DIGIT})*
+NUMBER		{DIGIT}+(\.{DIGIT}+)?(E[+-]?{DIGIT}+)?
+DELIMITER	[ \t\n]
+STRING		{LETTER}[a-zA-Z0-9]*
+INTEGER		[0-9]+
 
 
 %%
 	/*----- RULES PART -----*/
 
 	/* RULES FOR OPERATORS AND PUNCTUATIONS */
-"+"			{ return PLUS; }
-"-" 		{ return MINUS; }
-"*"			{ return ASTERISK; }
-"/"			{ return SLASH; }
-"%"			{ return REMAINDER; }
-"&&"		{ return LAND; }
-"||"		{ return LOR; }
-"!"			{ return LNOT; }
-"<"			{ return LESSTHAN; }
-">"			{ return GREATERTHAN; }
-"<="		{ return LESSEQUAL; }
-">="		{ return GREATEREQUAL; }
-"=="		{ return EQUALTO; }
-"!="		{ return NOTEQ; }
-"&"			{ return BAND; }
-"|"			{ return BOR; }
-"^"			{ return BXOR; }
-"("			{ return LPARA; }
-")"			{ return RPARA; }
-"["			{ return LSQUAREB; }
-"]"			{ return RSQUAREB; }
-"{"			{ return LCURLYB; }
-"}"			{ return RCURLYB; }
-","			{ return COMMA; }
-";"			{ return SEMICOLON; }
-"="			{ return ASSIGN; }
+"+"			{ printf("%s\t%d\t", yytext, atoi(yytext)); return PLUS; }
+"-" 		{ printf("%s\t%d\t", yytext, atoi(yytext)); return MINUS; }
+"*"			{ printf("%s\t%d\t", yytext, atoi(yytext)); return ASTERISK; }
+"/"			{ printf("%s\t%d\t", yytext, atoi(yytext)); return SLASH; }
+"%"			{ printf("%s\t%d\t", yytext, atoi(yytext)); return REMAINDER; }
+"&&"		{ printf("%s\t265\t", yytext); return LAND; }
+"||"		{ printf("%s\t266\t", yytext); return LOR; }
+"!"			{ printf("%s\t%d\t", yytext, atoi(yytext)); return LNOT; }
+"<"			{ printf("%s\t%d\t", yytext, atoi(yytext)); return LESSTHAN; }
+">"			{ printf("%s\t%d\t", yytext, atoi(yytext)); return GREATERTHAN; }
+"<="		{ printf("%s\t261\t", yytext); return LESSEQUAL; }
+">="		{ printf("%s\t262\t", yytext); return GREATEREQUAL; }
+"=="		{ printf("%s\t263\t", yytext); return EQUALTO; }
+"!="		{ printf("%s\t264\t", yytext); return NOTEQ; }
+"&"			{ printf("%s\t%d\t", yytext, atoi(yytext)); return BAND; }
+"|"			{ printf("%s\t%d\t", yytext, atoi(yytext)); return BOR; }
+"^"			{ printf("%s\t%d\t", yytext, atoi(yytext)); return BXOR; }
+"("			{ printf("%s\t%d\t", yytext, atoi(yytext)); return LPARA; }
+")"			{ printf("%s\t%d\t", yytext, atoi(yytext)); return RPARA; }
+"["			{ printf("%s\t%d\t", yytext, atoi(yytext)); return LSQUAREB; }
+"]"			{ printf("%s\t%d\t", yytext, atoi(yytext)); return RSQUAREB; }
+"{"			{ printf("%s\t%d\t", yytext, atoi(yytext)); return LCURLYB; }
+"}"			{ printf("%s\t%d\t", yytext, atoi(yytext)); return RCURLYB; }
+","			{ printf("%s\t%d\t", yytext, atoi(yytext)); return COMMA; }
+";"			{ printf("%s\t%d\t", yytext, atoi(yytext)); return SEMICOLON; }
+"="			{ printf("%s\t%d\t", yytext, atoi(yytext)); return ASSIGN; }
 
 	/* RULES FOR KEYWORDS */
 "char"		{ return CHARSYM; }
@@ -68,7 +73,10 @@ INTEGER		[0-9]{1,} /* One or more "one of the digits" */
 	/* RULES FOR LITERALS */
 {DIGIT}+	{ yylval.num = atoi(yytext);
 			  return NUMBER; }
-
+{ID}		{ yyval = (int) install_id();
+			  return ID; }
+{NUMBER}	{ yyval = (int) install_number();
+			  return NUMBER; }
 
 
 %%
@@ -76,4 +84,8 @@ INTEGER		[0-9]{1,} /* One or more "one of the digits" */
 main() {
 	printf("Input the source code and hit $\n");
 	yylex();
+}
+
+int install_id() {
+	
 }
