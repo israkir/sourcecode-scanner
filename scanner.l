@@ -13,26 +13,34 @@
  * ============================================================================
  */
 
+%{
+#include <math.h>
+#include <ctype.h>
+%}
 
+ 
 	/*----- DEFINITIONS PART -----*/
 DIGIT		[0-9]
 LETTER		[A-Za-z]
 ID			{LETTER}({LETTER}|{DIGIT})*
 NUMBER		{DIGIT}+(\.{DIGIT}+)?(E[+-]?{DIGIT}+)?
 DELIMITER	[ \t\n]
-STRING		{LETTER}[a-zA-Z0-9]*
-INTEGER		[0-9]+
+IDENTIFIER	{LETTER}[a-zA-Z0-9]*
+INTEGER		0|([1-9][0-9]*)
+
+	/* INTERNAL CONSTANT VARIABLES */
 
 
 %%
 	/*----- RULES PART -----*/
 
 	/* RULES FOR OPERATORS AND PUNCTUATIONS */
-"+"			{ printf("%s\t%d\t", yytext, atoi(yytext)); return PLUS; }
-"-" 		{ printf("%s\t%d\t", yytext, atoi(yytext)); return MINUS; }
-"*"			{ printf("%s\t%d\t", yytext, atoi(yytext)); return ASTERISK; }
-"/"			{ printf("%s\t%d\t", yytext, atoi(yytext)); return SLASH; }
-"%"			{ printf("%s\t%d\t", yytext, atoi(yytext)); return REMAINDER; }
+"+"			{ printf("%s\t%d\n", yytext, yytext[0]); }
+"-" 		{ printf("%s\t%d\n", yytext, yytext[0]); }
+"*"			{ printf("%s\t%d\n", yytext, yytext[0]); }
+"/"			{ printf("%s\t%d\n", yytext, yytext[0]); }
+"%"			{ printf("%s\t%d\n", yytext, yytext[0]); }
+	/*
 "&&"		{ printf("%s\t265\t", yytext); return LAND; }
 "||"		{ printf("%s\t266\t", yytext); return LOR; }
 "!"			{ printf("%s\t%d\t", yytext, atoi(yytext)); return LNOT; }
@@ -54,8 +62,10 @@ INTEGER		[0-9]+
 ","			{ printf("%s\t%d\t", yytext, atoi(yytext)); return COMMA; }
 ";"			{ printf("%s\t%d\t", yytext, atoi(yytext)); return SEMICOLON; }
 "="			{ printf("%s\t%d\t", yytext, atoi(yytext)); return ASSIGN; }
+	*/
 
 	/* RULES FOR KEYWORDS */
+	/*
 "char"		{ return CHARSYM; }
 "int"		{ return INTSYM; }
 "void"		{ return VOIDSYM; }
@@ -66,26 +76,27 @@ INTEGER		[0-9]+
 "continue"	{ return CONTINUESYM; }
 "break"		{ return BREAKSYM; }
 "return"	{ return RETURNSYM; }
-
+	*/
+	
 	/* RULES FOR IDENTIFIIERS */
-
+{IDENTIFIER}	{ printf("258\t%s\n", yytext); }
 
 	/* RULES FOR LITERALS */
-{DIGIT}+	{ yylval.num = atoi(yytext);
-			  return NUMBER; }
-{ID}		{ yyval = (int) install_id();
-			  return ID; }
-{NUMBER}	{ yyval = (int) install_number();
-			  return NUMBER; }
-
+{INTEGER}		{ printf("259\t%s\n", yytext, dec_to_hex(yytext)); }
+	/* TODO: STRING? */
+	
 
 %%
 	/*----- USER CODE PART -----*/
-main() {
-	printf("Input the source code and hit $\n");
-	yylex();
-}
-
-int install_id() {
+main( argc, argv )
+int argc;
+char **argv;
+    {
+    ++argv, --argc;  /* skip over program name */
+    if ( argc > 0 )
+            yyin = fopen( argv[0], "r" );
+    else
+            yyin = stdin;
+    yylex();
+    }
 	
-}
