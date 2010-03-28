@@ -12,91 +12,107 @@
  * TODO: ignore comments
  * ============================================================================
  */
-
-%{
-#include <math.h>
-#include <ctype.h>
-%}
-
  
-	/*----- DEFINITIONS PART -----*/
-DIGIT		[0-9]
-LETTER		[A-Za-z]
-ID			{LETTER}({LETTER}|{DIGIT})*
-NUMBER		{DIGIT}+(\.{DIGIT}+)?(E[+-]?{DIGIT}+)?
-DELIMITER	[ \t\n]
-IDENTIFIER	{LETTER}[a-zA-Z0-9]*
-INTEGER		0|([1-9][0-9]*)
+ 
+	/* ----- DEFINITIONS PART ----- */
+	/* ============================ */
+	
+	/* digit: any number from 0 to 9 */
+DIGIT			[0-9]
 
-	/* INTERNAL CONSTANT VARIABLES */
+	/* letter: any uppercase or lowercase letter */
+LETTER			[A-Za-z]
+
+	/* delimiter: any occurence of 'space', 'tab' or 'newline' */
+DELIMITER		[ \t\n]
+
+	/* identifier: starting with a letter; following by any occurence of letter, digit or underscore */
+IDENTIFIER		{LETTER}({LETTER}|{DIGIT}|"_")*
+
+	/* integer: */
+INTEGER			{DIGIT}+(\.{DIGIT}+)?(E[+-]?{DIGIT}+)?
+
+	/* string: */
+STRING			"\""(^"\n"|"|\|\(.|"\n"))*"\""
+
+	/* comment type 1 corresponds to single line c style comments */
+COMMENT1		"/*"[^}\n]*"*/"
 
 
 %%
-	/*----- RULES PART -----*/
+	/* ----- RULES PART ----- */
+	/* ====================== */
 
 	/* RULES FOR OPERATORS AND PUNCTUATIONS */
-"+"			{ printf("%s\t%d\n", yytext, yytext[0]); }
-"-" 		{ printf("%s\t%d\n", yytext, yytext[0]); }
-"*"			{ printf("%s\t%d\n", yytext, yytext[0]); }
-"/"			{ printf("%s\t%d\n", yytext, yytext[0]); }
-"%"			{ printf("%s\t%d\n", yytext, yytext[0]); }
-	/*
-"&&"		{ printf("%s\t265\t", yytext); return LAND; }
-"||"		{ printf("%s\t266\t", yytext); return LOR; }
-"!"			{ printf("%s\t%d\t", yytext, atoi(yytext)); return LNOT; }
-"<"			{ printf("%s\t%d\t", yytext, atoi(yytext)); return LESSTHAN; }
-">"			{ printf("%s\t%d\t", yytext, atoi(yytext)); return GREATERTHAN; }
-"<="		{ printf("%s\t261\t", yytext); return LESSEQUAL; }
-">="		{ printf("%s\t262\t", yytext); return GREATEREQUAL; }
-"=="		{ printf("%s\t263\t", yytext); return EQUALTO; }
-"!="		{ printf("%s\t264\t", yytext); return NOTEQ; }
-"&"			{ printf("%s\t%d\t", yytext, atoi(yytext)); return BAND; }
-"|"			{ printf("%s\t%d\t", yytext, atoi(yytext)); return BOR; }
-"^"			{ printf("%s\t%d\t", yytext, atoi(yytext)); return BXOR; }
-"("			{ printf("%s\t%d\t", yytext, atoi(yytext)); return LPARA; }
-")"			{ printf("%s\t%d\t", yytext, atoi(yytext)); return RPARA; }
-"["			{ printf("%s\t%d\t", yytext, atoi(yytext)); return LSQUAREB; }
-"]"			{ printf("%s\t%d\t", yytext, atoi(yytext)); return RSQUAREB; }
-"{"			{ printf("%s\t%d\t", yytext, atoi(yytext)); return LCURLYB; }
-"}"			{ printf("%s\t%d\t", yytext, atoi(yytext)); return RCURLYB; }
-","			{ printf("%s\t%d\t", yytext, atoi(yytext)); return COMMA; }
-";"			{ printf("%s\t%d\t", yytext, atoi(yytext)); return SEMICOLON; }
-"="			{ printf("%s\t%d\t", yytext, atoi(yytext)); return ASSIGN; }
-	*/
+	/* ------------------------------------ */
+"+"				{ printf("%s\t%d\n", yytext, yytext[0]); }
+"-" 			{ printf("%s\t%d\n", yytext, yytext[0]); }
+"*"				{ printf("%s\t%d\n", yytext, yytext[0]); }
+"/"				{ printf("%s\t%d\n", yytext, yytext[0]); }
+"%"				{ printf("%s\t%d\n", yytext, yytext[0]); }
+"&&"			{ printf("%s\t265\n", yytext); }
+"||"			{ printf("%s\t266\n", yytext); }
+"!"				{ printf("%s\t%d\n", yytext, yytext[0]); }
+"<"				{ printf("%s\t%d\n", yytext, yytext[0]); }
+">"				{ printf("%s\t%d\n", yytext, yytext[0]); }
+"<="			{ printf("%s\t261\n", yytext); }
+">="			{ printf("%s\t262\n", yytext); }
+"=="			{ printf("%s\t263\n", yytext); }
+"!="			{ printf("%s\t264\n", yytext); }
+"&"				{ printf("%s\t%d\n", yytext, yytext[0]); }
+"|"				{ printf("%s\t%d\n", yytext, yytext[0]); }
+"^"				{ printf("%s\t%d\n", yytext, yytext[0]); }
+"("				{ printf("%s\t%d\n", yytext, yytext[0]); }
+")"				{ printf("%s\t%d\n", yytext, yytext[0]); }
+"["				{ printf("%s\t%d\n", yytext, yytext[0]); }
+"]"				{ printf("%s\t%d\n", yytext, yytext[0]); }
+"{"				{ printf("%s\t%d\n", yytext, yytext[0]); }
+"}"				{ printf("%s\t%d\n", yytext, yytext[0]); }
+","				{ printf("%s\t%d\n", yytext, yytext[0]); }
+";"				{ printf("%s\t%d\n", yytext, yytext[0]); }
+"="				{ printf("%s\t%d\n", yytext, yytext[0]); }
 
 	/* RULES FOR KEYWORDS */
-	/*
-"char"		{ return CHARSYM; }
-"int"		{ return INTSYM; }
-"void"		{ return VOIDSYM; }
-"if"		{ return IFSYM; }
-"else"		{ return ELSESYM; }
-"while"		{ return WHILESYM; }
-"for" 		{ return FORSYM; }
-"continue"	{ return CONTINUESYM; }
-"break"		{ return BREAKSYM; }
-"return"	{ return RETURNSYM; }
-	*/
+	/* ------------------ */
+"char"			{ printf("%s\t268\n", yytext); }
+"int"			{ printf("%s\t269\n", yytext); }
+"void"			{ printf("%s\t270\n", yytext); }
+"if"			{ printf("%s\t271\n", yytext); }
+"else"			{ printf("%s\t272\n", yytext); }
+"while"			{ printf("%s\t273\n", yytext); }
+"for" 			{ printf("%s\t274\n", yytext); }
+"continue"		{ printf("%s\t275\n", yytext); }
+"break"			{ printf("%s\t276\n", yytext); }
+"return"		{ printf("%s\t277\n", yytext); }
 	
 	/* RULES FOR IDENTIFIIERS */
+	/* ---------------------- */
 {IDENTIFIER}	{ printf("258\t%s\n", yytext); }
 
 	/* RULES FOR LITERALS */
-{INTEGER}		{ printf("259\t%s\n", yytext, dec_to_hex(yytext)); }
-	/* TODO: STRING? */
+	/* ------------------ */
+{INTEGER}		{ printf("259\t%s\n", yytext); }
+{STRING}		{ printf("260\t%s\n", yytext); }
+
+	/* ignore any white space; i.e. no 'action'! */
+{DELIMITER}+
+
+	/* ignore any kind of comments */
+{COMMENT1}
 	
 
 %%
-	/*----- USER CODE PART -----*/
+	/* ----- USER CODE PART ----- */
+	/* ========================== */
 main( argc, argv )
 int argc;
 char **argv;
     {
-    ++argv, --argc;  /* skip over program name */
+    ++argv, --argc;
     if ( argc > 0 )
-            yyin = fopen( argv[0], "r" );
+		yyin = fopen( argv[0], "r" );
     else
-            yyin = stdin;
-    yylex();
+		yyin = stdin;
+	yylex();
     }
 	
