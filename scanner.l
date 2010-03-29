@@ -7,9 +7,11 @@
  * 					: gcc (Ubuntu 4.4.1-4ubuntu9) 4.4.1
  *					: flex 2.5.35
  * Notes			: 
- * 1) scanner.l follows up the c naming conventions: 
+ * 	1) scanner.l follows up the c naming conventions: 
  *	  http://www.cprogramming.com/tutorial/style_naming_conventions.html
- * TODO: ignore comments
+ * Usage			: There are two options,
+ *  1) a.out [input-filename]
+ *  2) a.out // hit enter and use stdin
  * ============================================================================
  */
  
@@ -33,10 +35,13 @@ IDENTIFIER		{LETTER}({LETTER}|{DIGIT}|"_")*
 INTEGER			{DIGIT}+(\.{DIGIT}+)?(E[+-]?{DIGIT}+)?
 
 	/* string: */
-STRING			"\""(^"\n"|"|\|\(.|"\n"))*"\""
 
-	/* comment type 1 corresponds to single line c style comments */
+
+	/* comment type 1 corresponds to single line c style comments between slash-star */
 COMMENT1		"/*"[^}\n]*"*/"
+
+	/* comment type 2 corresponds to single line c style comments after two-slashes */
+COMMENT2		"//"[^}\n]*"\n"
 
 
 %%
@@ -92,27 +97,27 @@ COMMENT1		"/*"[^}\n]*"*/"
 	/* RULES FOR LITERALS */
 	/* ------------------ */
 {INTEGER}		{ printf("259\t%s\n", yytext); }
-{STRING}		{ printf("260\t%s\n", yytext); }
+
 
 	/* ignore any white space; i.e. no 'action'! */
 {DELIMITER}+
 
-	/* ignore any kind of comments */
+	/* ignore any kind of comments; i.e. no 'action'! */
 {COMMENT1}
+{COMMENT2}
 	
 
 %%
 	/* ----- USER CODE PART ----- */
 	/* ========================== */
-main( argc, argv )
+main(argc, argv)
 int argc;
 char **argv;
     {
     ++argv, --argc;
     if ( argc > 0 )
-		yyin = fopen( argv[0], "r" );
+		yyin = fopen(argv[0], "r");
     else
 		yyin = stdin;
 	yylex();
     }
-	
