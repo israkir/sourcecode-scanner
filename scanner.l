@@ -1,18 +1,22 @@
-/* ============================================================================
- * Program Name 	: scanner.l
+/* 
+ ============================================================================
+ * Program Name 		: scanner.l
  * Author			: Hakki Caner Kirmizi
- * Description		: A C source code scanner written with flex.
- * Environment		: Linux ubuntu 2.6.31-14-generic #48-Ubuntu SMP 
- *						Fri Oct 16 14:05:01 UTC 2009 x86_64 GNU/Linux
- * 					: gcc (Ubuntu 4.4.1-4ubuntu9) 4.4.1
- *					: flex 2.5.35
+ * Description			: A C source code scanner written with flex.
+ * Environment			: Windows-7 Entreprise
+ * Editor			: vim 7.2 for WIN 
+ * Integration Tests		: linux2.csie.ntu.edu.tw
+ * Flex				:
+ * Compiler			:
+ * Version Control		: TortoiseSVN 1.6.7, Build 18415 - 32 Bit
+ * Project Hosting		: http://code.google.com/p/c-source-scanner/
  * Notes			: 
  * 	1) scanner.l follows up the c naming conventions: 
  *	  http://www.cprogramming.com/tutorial/style_naming_conventions.html
  * Usage			: There are two options,
  *  1) a.out [input-filename]
  *  2) a.out // hit enter and use stdin
- * ============================================================================
+ ============================================================================
  */
   
 	/* ----- DEFINITIONS PART ----- */
@@ -24,13 +28,13 @@
 #define PLUS		43
 #define MINUS		45
 #define MULT		42
-#define DIV			47
+#define DIV		47
 #define PERCENT		37
 #define LAND		265
-#define LOR			266
+#define LOR		266
 #define LNOT		33
 #define LESSTHAN	60
-#define GREATERTHAN 62
+#define GREATERTHAN 	62
 #define LTEQUAL		261		
 #define GTEQUAL		262
 #define EQUAL		263		
@@ -96,32 +100,32 @@ COMMENT2		"//"[^}\n]*"$
 
 	/* RULES FOR OPERATORS AND PUNCTUATIONS */
 	/* ------------------------------------ */
-"+"				{ printf("%s\t%d\n", yytext, yytext[0]); }
+"+"			{ printf("%s\t%d\n", yytext, yytext[0]); }
 "-" 			{ printf("%s\t%d\n", yytext, yytext[0]); }
-"*"				{ printf("%s\t%d\n", yytext, yytext[0]); }
-"/"				{ printf("%s\t%d\n", yytext, yytext[0]); }
-"%"				{ printf("%s\t%d\n", yytext, yytext[0]); }
+"*"			{ printf("%s\t%d\n", yytext, yytext[0]); }
+"/"			{ printf("%s\t%d\n", yytext, yytext[0]); }
+"%"			{ printf("%s\t%d\n", yytext, yytext[0]); }
 "&&"			{ printf("%s\t265\n", yytext); }
 "||"			{ printf("%s\t266\n", yytext); }
-"!"				{ printf("%s\t%d\n", yytext, yytext[0]); }
-"<"				{ printf("%s\t%d\n", yytext, yytext[0]); }
-">"				{ printf("%s\t%d\n", yytext, yytext[0]); }
+"!"			{ printf("%s\t%d\n", yytext, yytext[0]); }
+"<"			{ printf("%s\t%d\n", yytext, yytext[0]); }
+">"			{ printf("%s\t%d\n", yytext, yytext[0]); }
 "<="			{ printf("%s\t261\n", yytext); }
 ">="			{ printf("%s\t262\n", yytext); }
 "=="			{ printf("%s\t263\n", yytext); }
 "!="			{ printf("%s\t264\n", yytext); }
-"&"				{ printf("%s\t%d\n", yytext, yytext[0]); }
-"|"				{ printf("%s\t%d\n", yytext, yytext[0]); }
-"^"				{ printf("%s\t%d\n", yytext, yytext[0]); }
-"("				{ printf("%s\t%d\n", yytext, yytext[0]); }
-")"				{ printf("%s\t%d\n", yytext, yytext[0]); }
-"["				{ printf("%s\t%d\n", yytext, yytext[0]); }
-"]"				{ printf("%s\t%d\n", yytext, yytext[0]); }
-"{"				{ printf("%s\t%d\n", yytext, yytext[0]); }
-"}"				{ printf("%s\t%d\n", yytext, yytext[0]); }
-","				{ printf("%s\t%d\n", yytext, yytext[0]); }
-";"				{ printf("%s\t%d\n", yytext, yytext[0]); }
-"="				{ printf("%s\t%d\n", yytext, yytext[0]); }
+"&"			{ printf("%s\t%d\n", yytext, yytext[0]); }
+"|"			{ printf("%s\t%d\n", yytext, yytext[0]); }
+"^"			{ printf("%s\t%d\n", yytext, yytext[0]); }
+"("			{ printf("%s\t%d\n", yytext, yytext[0]); }
+")"			{ printf("%s\t%d\n", yytext, yytext[0]); }
+"["			{ printf("%s\t%d\n", yytext, yytext[0]); }
+"]"			{ printf("%s\t%d\n", yytext, yytext[0]); }
+"{"			{ printf("%s\t%d\n", yytext, yytext[0]); }
+"}"			{ printf("%s\t%d\n", yytext, yytext[0]); }
+","			{ printf("%s\t%d\n", yytext, yytext[0]); }
+";"			{ printf("%s\t%d\n", yytext, yytext[0]); }
+"="			{ printf("%s\t%d\n", yytext, yytext[0]); }
 
 	/* RULES FOR KEYWORDS */
 	/* ------------------ */
@@ -138,7 +142,7 @@ COMMENT2		"//"[^}\n]*"$
 	
 	/* RULES FOR IDENTIFIIERS */
 	/* ---------------------- */
-{IDENTIFIER}	{ printf("258\t%s\n", yytext); }
+{IDENTIFIER}		{ printf("258\t%s\n", yytext); }
 
 	/* RULES FOR LITERALS */
 	/* ------------------ */
