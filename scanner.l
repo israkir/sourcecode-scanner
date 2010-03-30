@@ -14,10 +14,56 @@
  *  2) a.out // hit enter and use stdin
  * ============================================================================
  */
- 
- 
+  
 	/* ----- DEFINITIONS PART ----- */
 	/* ============================ */
+	
+	/* DEFINITIONS FOR TOKEN CODES */
+	/* --------------------------- */
+%{
+#define PLUS		43
+#define MINUS		45
+#define MULT		42
+#define DIV			47
+#define PERCENT		37
+#define LAND		265
+#define LOR			266
+#define LNOT		33
+#define LESSTHAN	60
+#define GREATERTHAN 62
+#define LTEQUAL		261		
+#define GTEQUAL		262
+#define EQUAL		263		
+#define NOTEQUAL	264
+#define BITAND		38
+#define BITOR		124
+#define BITXOR		94
+#define LPARA		40
+#define RPARA		41
+#define LBOX		91
+#define RBOX		93
+#define LCURLY		123
+#define RURLY		125
+#define COMMA		44
+#define SEMICOLON	59
+#define ASSIGN		61
+#define CHARSYM		268
+#define INTSYM		269
+#define VOIDSYM		270
+#define IFSYM		271
+#define ELSESYM		272
+#define WHILESYM	273
+#define FORSYM		274
+#define CONTINUESYM	275
+#define BREAKSYM	276
+#define RETURNSYM	277
+#define IDENTIFIER	258
+#define INTEGER		259
+#define STRING		260
+%}
+
+	/* DEFINITIONS FOR FINITE AUTOMATA */
+	/* ------------------------------- */
 	
 	/* digit: any number from 0 to 9 */
 DIGIT			[0-9]
@@ -29,19 +75,19 @@ LETTER			[A-Za-z]
 DELIMITER		[ \t\n]
 
 	/* identifier: starting with a letter; following by any occurence of letter, digit or underscore */
-IDENTIFIER		{LETTER}({LETTER}|{DIGIT}|"_")*
+IDENTIFIER		{LETTER}[{LETTER}{DIGIT}_]*
 
 	/* integer: */
-INTEGER			{DIGIT}+(\.{DIGIT}+)?(E[+-]?{DIGIT}+)?
+INTEGER			0|([1-9][0-9]*)
 
 	/* string: */
-
+STRING			\"[^\"\n]*\"
 
 	/* comment type 1 corresponds to single line c style comments between slash-star */
 COMMENT1		"/*"[^}\n]*"*/"
 
 	/* comment type 2 corresponds to single line c style comments after two-slashes */
-COMMENT2		"//"[^}\n]*"\n"
+COMMENT2		"//"[^}\n]*"$
 
 
 %%
@@ -97,7 +143,7 @@ COMMENT2		"//"[^}\n]*"\n"
 	/* RULES FOR LITERALS */
 	/* ------------------ */
 {INTEGER}		{ printf("259\t%s\n", yytext); }
-
+{STRING}		{ printf("260\t%s\n", yytext); }
 
 	/* ignore any white space; i.e. no 'action'! */
 {DELIMITER}+
