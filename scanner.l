@@ -6,8 +6,8 @@
  * Environment			: Windows-7 Entreprise
  * Editor			: vim 7.2 for WIN 
  * Integration Tests		: linux2.csie.ntu.edu.tw
- * Flex				:
- * Compiler			:
+ * Flex				: 2.5.35
+ * Compiler			: gcc (Debian 4.4.3-3) 4.4.3
  * Version Control		: TortoiseSVN 1.6.7, Build 18415 - 32 Bit
  * Project Hosting		: http://code.google.com/p/c-source-scanner/
  * Notes			: 
