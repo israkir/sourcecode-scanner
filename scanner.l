@@ -11,8 +11,8 @@
  * Version Control		: TortoiseSVN 1.6.7, Build 18415 - 32 Bit
  * Project Hosting		: http://code.google.com/p/c-source-scanner/
  * Notes			: 
- * 	1) scanner.l follows up the c naming conventions: 
- *	  http://www.cprogramming.com/tutorial/style_naming_conventions.html
+ *  1) scanner.l follows up the c naming conventions: 
+ *	http://www.cprogramming.com/tutorial/style_naming_conventions.html
  * Usage			: There are two options,
  *  1) a.out [input-filename]
  *  2) a.out // hit enter and use stdin
@@ -24,6 +24,9 @@
 	
 	/* DEFINITIONS FOR TOKEN CODES */
 	/* --------------------------- */
+	
+	/* ' The literal block %{ ... %} ' in this part is copied to verbatim to the generated 
+	    C source file near the beginning, before the beginning of yylex() */
 %{
 #define PLUS		43
 #define MINUS		45
@@ -44,10 +47,10 @@
 #define BITXOR		94
 #define LPARA		40
 #define RPARA		41
-#define LBOX		91
-#define RBOX		93
+#define LBRACKET	91
+#define RBRACKET	93
 #define LCURLY		123
-#define RURLY		125
+#define RCURLY		125
 #define COMMA		44
 #define SEMICOLON	59
 #define ASSIGN		61
@@ -64,6 +67,28 @@
 #define IDENTIFIER	258
 #define INTEGER		259
 #define STRING		260
+
+const char* dec_to_hex(const char* number) {
+	char *temp;
+	char *buffer;
+	int len, i;
+	
+	temp = malloc(sizeof(char) * 11);
+	buffer = malloc(sizeof(char) * 8);
+
+	sprintf(buffer, "%x", atoi(number));
+	sprintf(temp, "0x");
+	len = strlen(buffer);
+	
+	for (i=2; i<10-len; i++)
+		temp[i] = '0';
+	
+	strncat(temp, buffer, len);
+	return temp;
+	free(buffer);
+	free(temp);
+}
+
 %}
 
 	/* DEFINITIONS FOR FINITE AUTOMATA */
@@ -79,19 +104,25 @@ LETTER			[A-Za-z]
 DELIMITER		[ \t\n]
 
 	/* identifier: starting with a letter; following by any occurence of letter, digit or underscore */
-IDENTIFIER		{LETTER}[{LETTER}{DIGIT}_]*
+IDENTIFIER		{LETTER}({LETTER}|{DIGIT}|"_")*
 
-	/* integer: */
+	/* integer: 0 or more occurence of consecutive digits */
 INTEGER			0|([1-9][0-9]*)
 
-	/* string: */
+	/* string: anything between double quote; just considers \" and \\ characters */
 STRING			\"[^\"\n]*\"
 
 	/* comment type 1 corresponds to single line c style comments between slash-star */
 COMMENT1		"/*"[^}\n]*"*/"
 
 	/* comment type 2 corresponds to single line c style comments after two-slashes */
-COMMENT2		"//"[^}\n]*"$
+COMMENT2		"//"[^}\n]*"\n"
+
+	/* comment type 3 corresponds to there be text before or following comment */
+COMMENT3		.+"/*".*"*/".*\n
+
+	/* comment type 4 corresponds to there be text following comment */
+COMMENT4		.*"/*".*"*/".+\n
 
 
 %%
@@ -100,54 +131,54 @@ COMMENT2		"//"[^}\n]*"$
 
 	/* RULES FOR OPERATORS AND PUNCTUATIONS */
 	/* ------------------------------------ */
-"+"			{ printf("%s\t%d\n", yytext, yytext[0]); }
-"-" 			{ printf("%s\t%d\n", yytext, yytext[0]); }
-"*"			{ printf("%s\t%d\n", yytext, yytext[0]); }
-"/"			{ printf("%s\t%d\n", yytext, yytext[0]); }
-"%"			{ printf("%s\t%d\n", yytext, yytext[0]); }
-"&&"			{ printf("%s\t265\n", yytext); }
-"||"			{ printf("%s\t266\n", yytext); }
-"!"			{ printf("%s\t%d\n", yytext, yytext[0]); }
-"<"			{ printf("%s\t%d\n", yytext, yytext[0]); }
-">"			{ printf("%s\t%d\n", yytext, yytext[0]); }
-"<="			{ printf("%s\t261\n", yytext); }
-">="			{ printf("%s\t262\n", yytext); }
-"=="			{ printf("%s\t263\n", yytext); }
-"!="			{ printf("%s\t264\n", yytext); }
-"&"			{ printf("%s\t%d\n", yytext, yytext[0]); }
-"|"			{ printf("%s\t%d\n", yytext, yytext[0]); }
-"^"			{ printf("%s\t%d\n", yytext, yytext[0]); }
-"("			{ printf("%s\t%d\n", yytext, yytext[0]); }
-")"			{ printf("%s\t%d\n", yytext, yytext[0]); }
-"["			{ printf("%s\t%d\n", yytext, yytext[0]); }
-"]"			{ printf("%s\t%d\n", yytext, yytext[0]); }
-"{"			{ printf("%s\t%d\n", yytext, yytext[0]); }
-"}"			{ printf("%s\t%d\n", yytext, yytext[0]); }
-","			{ printf("%s\t%d\n", yytext, yytext[0]); }
-";"			{ printf("%s\t%d\n", yytext, yytext[0]); }
-"="			{ printf("%s\t%d\n", yytext, yytext[0]); }
+"+"			{ printf("%d\n", PLUS); }
+"-" 			{ printf("%d\n", MINUS); }
+"*"			{ printf("%d\n", MULT); }
+"/"			{ printf("%d\n", DIV); }
+"%"			{ printf("%d\n", PERCENT); }
+"&&"			{ printf("%d\n", LAND); }
+"||"			{ printf("%d\n", LOR); }
+"!"			{ printf("%d\n", LNOT); }
+"<"			{ printf("%d\n", LESSTHAN); }
+">"			{ printf("%d\n", GREATERTHAN); }
+"<="			{ printf("%d\n", LTEQUAL); }
+">="			{ printf("%d\n", GTEQUAL); }
+"=="			{ printf("%d\n", EQUAL); }
+"!="			{ printf("%d\n", NOTEQUAL); }
+"&"			{ printf("%d\n", BITAND); }
+"|"			{ printf("%d\n", BITOR); }
+"^"			{ printf("%d\n", BITXOR); }
+"("			{ printf("%d\n", LPARA); }
+")"			{ printf("%d\n", RPARA); }
+"["			{ printf("%d\n", LBRACKET); }
+"]"			{ printf("%d\n", RBRACKET); }
+"{"			{ printf("%d\n", LCURLY); }
+"}"			{ printf("%d\n", RCURLY); }
+","			{ printf("%d\n", COMMA); }
+";"			{ printf("%d\n", SEMICOLON); }
+"="			{ printf("%d\n", ASSIGN); }
 
 	/* RULES FOR KEYWORDS */
 	/* ------------------ */
-"char"			{ printf("%s\t268\n", yytext); }
-"int"			{ printf("%s\t269\n", yytext); }
-"void"			{ printf("%s\t270\n", yytext); }
-"if"			{ printf("%s\t271\n", yytext); }
-"else"			{ printf("%s\t272\n", yytext); }
-"while"			{ printf("%s\t273\n", yytext); }
-"for" 			{ printf("%s\t274\n", yytext); }
-"continue"		{ printf("%s\t275\n", yytext); }
-"break"			{ printf("%s\t276\n", yytext); }
-"return"		{ printf("%s\t277\n", yytext); }
+"char"			{ printf("%d\n", CHARSYM); }
+"int"			{ printf("%d\n", INTSYM); }
+"void"			{ printf("%d\n", VOIDSYM); }
+"if"			{ printf("%d\n", IFSYM); }
+"else"			{ printf("%d\n", ELSESYM); }
+"while"			{ printf("%d\n", WHILESYM); }
+"for" 			{ printf("%d\n", FORSYM); }
+"continue"		{ printf("%d\n", CONTINUESYM); }
+"break"			{ printf("%d\n", BREAKSYM); }
+"return"		{ printf("%d\n", RETURNSYM); }
 	
 	/* RULES FOR IDENTIFIIERS */
 	/* ---------------------- */
-{IDENTIFIER}		{ printf("258\t%s\n", yytext); }
+{IDENTIFIER}		{ printf("%d\t%s\n", IDENTIFIER, yytext); }
 
 	/* RULES FOR LITERALS */
 	/* ------------------ */
-{INTEGER}		{ printf("259\t%s\n", yytext); }
-{STRING}		{ printf("260\t%s\n", yytext); }
+{INTEGER}		{ printf("%d\t%s\n", INTEGER, dec_to_hex(yytext)); }
+{STRING}		{ printf("%d\t%s\n", STRING, yytext); }
 
 	/* ignore any white space; i.e. no 'action'! */
 {DELIMITER}+
@@ -155,6 +186,8 @@ COMMENT2		"//"[^}\n]*"$
 	/* ignore any kind of comments; i.e. no 'action'! */
 {COMMENT1}
 {COMMENT2}
+{COMMENT3}
+{COMMENT4}
 	
 
 %%
