@@ -40,7 +40,7 @@
  *  2) Constant ID of the ASCII characters are same with their ASCII codes.
  *  3) Regex for comments based on: 
  *     http://ostermiller.org/findcomment.html
- *  4) O'Reilly's Flex&Bison is a very good resource, if you want to take
+ *  4) O'Reilly's Flex&Bison book is a very good resource, if you want to
  *     know more about flex and bison.
  ============================================================================
  */
