@@ -1,31 +1,47 @@
 /* 
  ============================================================================
- * Program Name 		: scanner.l
- * Author			: Hakki Caner Kirmizi
- * Description			: A C source code scanner written with flex.
- * Environment			: Windows-7 Entreprise
- * Editor			: vim 7.2 for WIN 
- * Integration Tests		: linux2.csie.ntu.edu.tw
- * Flex				: 2.5.35
- * Compiler			: gcc (Debian 4.4.3-3) 4.4.3
- * Version Control		: TortoiseSVN 1.6.7, Build 18415 - 32 Bit
- * Project Hosting		: http://code.google.com/p/c-source-scanner/
+ * Program Name 	: scanner.l
+ * Author		: Hakki Caner Kirmizi
+ * Description		: A C source code scanner written with flex.
+ * Environment		: Windows-7 Entreprise
+ * Editor		: vim 7.2 for WIN 
+ * Integration Tests	: linux2.csie.ntu.edu.tw
+ * Flex			: 2.5.35
+ * Compiler		: gcc (Debian 4.4.3-3) 4.4.3
+ * Version Control	: TortoiseSVN 1.6.7, Build 18415 - 32 Bit
+ * Project Hosting	: http://code.google.com/p/c-source-scanner/
  * 
  * INSTRUCTIONS
  * ------------
- * Build			: flex scanner.l
- * Compile			: gcc lex.yy.c -lfl
- * Run				: There are two options...
+ * Build		: flex scanner.l
+ * Compile		: gcc lex.yy.c -lfl
+ * Run			: There are two options...
  *  1) a.out [input-filename] // recommended for long source codes
  *  2) a.out // hit enter and use stdin; BE AWARE OF BUFFER SIZE!!!
  * 
+ * DETAILS
+ * -------
+ * c-source-scanner is written for these purposes:
+ *  1) To understand how to scan a program's source code file.
+ *  2) To understand how to use a scanner generator to 'generate' a 
+ *     source code generator.
+ *  3) To understand how to use finite automata concept via defining regular 
+ *     expressions to match the lexeme of the code and output the tokens.
+ * 
+ * c-source-scanner is NOT written for these purposes (at-least-for-now):
+ *  1) To provide a 'full' scanner program for C language.
+ *  2) To construct a symbol table for future enhancements of building a 
+ *     real compiler.
+ *
  * NOTES
  * -----
  *  1) scanner.l follows up the c naming conventions: 
  *     http://www.cprogramming.com/tutorial/style_naming_conventions.html
- *  2) Regex for comments based on: 
+ *  2) Constant ID of the ASCII characters are same with their ASCII codes.
+ *  3) Regex for comments based on: 
  *     http://ostermiller.org/findcomment.html
- * 
+ *  4) O'Reilly's Flex&Bison is a very good resource, if you want to take
+ *     know more about flex and bison.
  ============================================================================
  */
   
@@ -79,7 +95,7 @@
 #define STRING		260
 
 /* Function		: dec_to_hex
- * Description	: Decimal to Hexadecimal Converter
+ * Description		: Decimal to Hexadecimal Converter
  * The function takes a char pointer (which is flex's yytext) and using 
  * format place holder tecnique to do the convertion. Additionally it
  * manipulates the string to construct the 32-bit representation of the 
@@ -106,7 +122,7 @@ const char* dec_to_hex(const char* number) {
 }
 
 /* Function		: clean_str 
- * Description	: Remove leading and tailing double quotes from string
+ * Description		: Remove leading/tailing double quotes of string
  * The function takes a char pointer (which is flex's yytext) and using 
  * strncpy function to copy it to the temp array starting from the 1st
  * index of 'str' and ignoring the tailing double quote with exchanging
