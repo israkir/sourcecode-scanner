@@ -10,12 +10,22 @@
  * Compiler			: gcc (Debian 4.4.3-3) 4.4.3
  * Version Control		: TortoiseSVN 1.6.7, Build 18415 - 32 Bit
  * Project Hosting		: http://code.google.com/p/c-source-scanner/
- * Notes			: 
+ * 
+ * INSTRUCTIONS
+ * ------------
+ * Build			: flex scanner.l
+ * Compile			: gcc lex.yy.c -lfl
+ * Run				: There are two options...
+ *  1) a.out [input-filename] // recommended for long source codes
+ *  2) a.out // hit enter and use stdin; BE AWARE OF BUFFER SIZE!!!
+ * 
+ * NOTES
+ * -----
  *  1) scanner.l follows up the c naming conventions: 
- *	http://www.cprogramming.com/tutorial/style_naming_conventions.html
- * Usage			: There are two options,
- *  1) a.out [input-filename]
- *  2) a.out // hit enter and use stdin
+ *     http://www.cprogramming.com/tutorial/style_naming_conventions.html
+ *  2) Regex for comments based on: 
+ *     http://ostermiller.org/findcomment.html
+ * 
  ============================================================================
  */
   
@@ -68,6 +78,13 @@
 #define INTEGER		259
 #define STRING		260
 
+/* Function		: dec_to_hex
+ * Description	: Decimal to Hexadecimal Converter
+ * The function takes a char pointer (which is flex's yytext) and using 
+ * format place holder tecnique to do the convertion. Additionally it
+ * manipulates the string to construct the 32-bit representation of the 
+ * hexadecimal number (e.g. 0x7fffffff).
+ */
 const char* dec_to_hex(const char* number) {
 	char *temp;
 	char *buffer;
@@ -75,7 +92,6 @@ const char* dec_to_hex(const char* number) {
 	
 	temp = malloc(sizeof(char) * 11);
 	buffer = malloc(sizeof(char) * 8);
-
 	sprintf(buffer, "%x", atoi(number));
 	sprintf(temp, "0x");
 	len = strlen(buffer);
@@ -89,40 +105,52 @@ const char* dec_to_hex(const char* number) {
 	free(temp);
 }
 
+/* Function		: clean_str 
+ * Description	: Remove leading and tailing double quotes from string
+ * The function takes a char pointer (which is flex's yytext) and using 
+ * strncpy function to copy it to the temp array starting from the 1st
+ * index of 'str' and ignoring the tailing double quote with exchanging
+ * it a null-character.
+ */
+const char* clean_str(const char* str) {
+	char *temp;
+	int len;
+	len = strlen(str);
+	temp = malloc(sizeof(char) * (len-1));
+	strncpy(temp, (++str), len-1);
+	temp[len-2] = '\0';
+	return temp;
+	free(temp);
+}
+
 %}
 
 	/* DEFINITIONS FOR FINITE AUTOMATA */
 	/* ------------------------------- */
 	
-	/* digit: any number from 0 to 9 */
+	/* Universal Character Name: the naming conventions for UCS defined by International Standard ISO/IEC 10646 */
+UCN     		(\\u[0-9a-fA-F]{4}|\\U[0-9a-fA-F]{8})
+	
+	/* DIGIT: any number from 0 to 9 */
 DIGIT			[0-9]
 
-	/* letter: any uppercase or lowercase letter */
+	/* LETTER: any uppercase or lowercase letter */
 LETTER			[A-Za-z]
 
-	/* delimiter: any occurence of 'space', 'tab' or 'newline' */
+	/* DELIMITER: any occurence of 'space', 'tab' or 'newline' */
 DELIMITER		[ \t\n]
 
-	/* identifier: starting with a letter; following by any occurence of letter, digit or underscore */
-IDENTIFIER		{LETTER}({LETTER}|{DIGIT}|"_")*
+	/* IDENTIFIER: starting with a letter; following by any occurence of letter, digit or underscore */
+IDENTIFIER		([_a-zA-Z]|{UCN})([_a-zA-Z0-9]|{UCN})*
 
-	/* integer: 0 or more occurence of consecutive digits */
+	/* INTEGER: 0 or more occurence of consecutive digits */
 INTEGER			0|([1-9][0-9]*)
 
-	/* string: anything between double quote; just considers \" and \\ characters */
-STRING			\"[^\"\n]*\"
+	/* STRING: anything between double quote; just considers \" and \\ characters */
+STRING			L?\"([^"\\]|\\['"?\\abfnrtv]|\\[0-7]{1,3}|\\[Xx][0-9a-fA-F]+|{UCN})*\"
 
-	/* comment type 1 corresponds to single line c style comments between slash-star */
-COMMENT1		"/*"[^}\n]*"*/"
-
-	/* comment type 2 corresponds to single line c style comments after two-slashes */
-COMMENT2		"//"[^}\n]*"\n"
-
-	/* comment type 3 corresponds to there be text before or following comment */
-COMMENT3		.+"/*".*"*/".*\n
-
-	/* comment type 4 corresponds to there be text following comment */
-COMMENT4		.*"/*".*"*/".+\n
+	/* COMMENT: any c style comment */
+COMMENT			("/*"([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*"*"+"/")|("//".*)
 
 
 %%
@@ -178,17 +206,13 @@ COMMENT4		.*"/*".*"*/".+\n
 	/* RULES FOR LITERALS */
 	/* ------------------ */
 {INTEGER}		{ printf("%d\t%s\n", INTEGER, dec_to_hex(yytext)); }
-{STRING}		{ printf("%d\t%s\n", STRING, yytext); }
+{STRING}		{ printf("%d\t%s\n", STRING, clean_str(yytext)); }
 
-	/* ignore any white space; i.e. no 'action'! */
+	/* ignore any kind of white space; i.e. no 'action'! */
 {DELIMITER}+
 
 	/* ignore any kind of comments; i.e. no 'action'! */
-{COMMENT1}
-{COMMENT2}
-{COMMENT3}
-{COMMENT4}
-	
+{COMMENT}
 
 %%
 	/* ----- USER CODE PART ----- */
@@ -196,11 +220,16 @@ COMMENT4		.*"/*".*"*/".+\n
 main(argc, argv)
 int argc;
 char **argv;
-    {
-    ++argv, --argc;
-    if ( argc > 0 )
-		yyin = fopen(argv[0], "r");
-    else
+{
+	YY_BUFFER_STATE bp;
+	extern FILE* yyin;
+	
+	if (argc>1) {
+		yyin = fopen(argv[1],"r");
+	} else {
 		yyin = stdin;
+		bp = yy_create_buffer(yyin, YY_BUF_SIZE); // YY_BUF_SIZE defined by flex, typically 16K=16384
+		yy_switch_to_buffer(bp);  // tell it to use the buffer we just made
+	}
 	yylex();
-    }
+}
