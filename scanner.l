@@ -1,7 +1,7 @@
 /* 
  ============================================================================
  * Program Name 	: scanner.l
- * Author		: Hakki Caner Kirmizi
+ * Author		: #B96902133, Hakki Caner Kirmizi
  * Description		: A C source code scanner written with flex.
  * Environment		: Windows-7 Entreprise
  * Editor		: vim 7.2 for WIN 
@@ -14,7 +14,7 @@
  * INSTRUCTIONS
  * ------------
  * Build		: flex scanner.l
- * Compile		: gcc lex.yy.c -lfl
+ * Compile		: gcc lex.yy.c
  * Run			: There are two options...
  *  1) a.out [input-filename] // recommended for long source codes
  *  2) a.out // hit enter and use stdin; BE AWARE OF BUFFER SIZE!!!
@@ -44,6 +44,9 @@
  *     know more about flex and bison.
  ============================================================================
  */
+
+	/* we do not need flex library */
+%option noyywrap
   
 	/* ----- DEFINITIONS PART ----- */
 	/* ============================ */
